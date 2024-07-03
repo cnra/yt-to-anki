@@ -2,6 +2,7 @@ from pathlib import Path
 import subprocess
 import tempfile
 import os
+import re
 
 from .utils import get_ffmpeg
 
@@ -9,11 +10,13 @@ from .utils import get_ffmpeg
 class Ffmpeg:
     def __init__(self, subtitle, video_path, video_title):
         self.time_diff = (subtitle.time_end - subtitle.time_start).total_seconds()
+        sanitized_title = re.sub(r'[^\w_ -]', '_', video_title)
         media_path_prefix = Path(tempfile.gettempdir()).joinpath(
-            f"{video_title}_\
+            f"{sanitized_title}_\
                   {str(subtitle.time_start).replace('.','_').replace(':','_')}_\
                   {str(self.time_diff).replace('.','_').replace(':','_')}",
         )
+        
         self.audio_path = str(media_path_prefix.with_suffix(".mp3"))
         self.picture_path = str(media_path_prefix.with_suffix(".jpeg"))
         self.video_path = video_path
